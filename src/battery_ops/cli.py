@@ -1,6 +1,7 @@
 import argparse
 from dataclasses import asdict
 import json
+import subprocess
 import sys
 from battery_ops.adapters import MacOSPower
 from battery_ops.application import BatteryService
@@ -24,11 +25,6 @@ def main(argv=None):
             result = service.change_low_power(args.mode == "on", args.scope, apply=args.apply)
             print(json.dumps({"argv": result.argv, "applied": args.apply}))
         return 0
-    except (OSError, ValueError, RuntimeError, subprocess_error()) as error:
+    except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
         print(str(error), file=sys.stderr)
         return 1
-
-
-def subprocess_error():
-    from subprocess import TimeoutExpired
-    return TimeoutExpired
